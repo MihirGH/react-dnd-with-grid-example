@@ -1,19 +1,11 @@
 // Libraries
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
+import { useDragLayer } from "react-dnd";
 import { Grid } from "react-virtualized";
 import update from "immutability-helper";
 
-// Context
-import { IndicatorStateProvider } from "../contexts/IndicatorStateContext";
-
 // Components
-import {
-  SortableCellContainer,
-  SortableCellWithContextContainer
-} from "./Cell";
-
-// Types
-import { IndicatorsState } from "../types";
+import { SortableCellContainer } from "./Cell";
 
 // Styles
 import "../tableStyles.css";
@@ -58,9 +50,8 @@ const DragLayer = ({
 
   const displacementY =
     (currentOffset?.y ?? 0) - (initialSourceClientOffset?.y ?? 0);
-  const yInitPointer = initialClientOffset?.y ?? 0;
-  const yInitSource = initialSourceClientOffset?.y ?? 0;
-  const top = (currentOffset?.y ?? 0) + yInitPointer - yInitSource + 1;
+
+  const top = currentOffset?.y ?? 0;
 
   return (
     <div
@@ -71,21 +62,15 @@ const DragLayer = ({
         width: `${tableWidth}px`,
         display: !displacementY ? "none" : "block",
         top: `${top}px`,
-        left: `${leftOffset}px`
+        left: `${leftOffset}px`,
+        zIndex: 10
       }}
     />
   );
 };
 
-const Table = ({
-  Cell = SortableCellContainer,
-  dragStartIndex,
-  hoverIndex
-}: {
-  Cell?: typeof SortableCellContainer | typeof SortableCellWithContextContainer;
-  dragStartIndex?: number;
-  hoverIndex?: number;
-}): React.ReactElement => {
+const Table = (): React.ReactElement => {
+  const [showCustomDragLayer, setShowCustomDragLayer] = useState(false);
   const [rows, setRows] = useState(() => generateData());
 
   const moveRows = useCallback((dragIndex, hoverIndex) => {
@@ -102,22 +87,24 @@ const Table = ({
 
   const cellRenderer = ({ columnIndex, key, rowIndex, style }) => (
     <div key={key} style={style}>
-      <Cell
+      <SortableCellContainer
         id={rows[rowIndex][columnIndex]}
         rowIndex={rowIndex}
         columnIndex={columnIndex}
         text={rows[rowIndex][columnIndex]}
         moveRows={moveRows}
-        dragStartIndex={dragStartIndex}
-        hoverIndex={hoverIndex}
+        showCustomDragLayer={showCustomDragLayer}
       />
     </div>
   );
 
   return (
     <>
-      <DragLayer rowHeight={64} leftOffset={0} tableWidth={500} />
+      {showCustomDragLayer ? (
+        <DragLayer rowHeight={64} leftOffset={8} tableWidth={500} />
+      ) : null}
       <Grid
+        key={showCustomDragLayer ? "show" : "hide"}
         cellRenderer={cellRenderer}
         columnCount={COLUMNS_COUNT}
         columnWidth={140}
@@ -127,28 +114,10 @@ const Table = ({
         width={500}
         rows={rows}
       />
+      <button onClick={() => setShowCustomDragLayer((prev) => !prev)}>
+        {showCustomDragLayer ? "Hide Custom Layer" : "Show Custom Layer"}
+      </button>
     </>
-  );
-};
-
-export const TableWithContext = () => {
-  const [{ dragStartIndex, hoverIndex }, setDragDropIndicators] = useState<
-    IndicatorsState
-  >({
-    dragStartIndex: -1,
-    hoverIndex: -1
-  });
-
-  const contextValue = useMemo(() => ({ setDragDropIndicators }), []);
-
-  return (
-    <IndicatorStateProvider value={contextValue}>
-      <Table
-        Cell={SortableCellWithContextContainer}
-        dragStartIndex={dragStartIndex}
-        hoverIndex={hoverIndex}
-      />
-    </IndicatorStateProvider>
   );
 };
 

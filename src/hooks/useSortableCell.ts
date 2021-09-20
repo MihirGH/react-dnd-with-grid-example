@@ -1,9 +1,7 @@
 // Libraries
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDrag, useDrop } from "react-dnd";
-
-// Contexts
-import { useIndicatorStateContext } from "../contexts/IndicatorStateContext";
+import { getEmptyImage } from "react-dnd-html5-backend";
 
 // Constants
 import { SORTABLE_ROW_ITEM_TYPE } from "../constants";
@@ -20,11 +18,13 @@ interface Item {
 export const useBaseSortableCell = ({
   isSortable,
   itemToRegister,
+  showCustomDragLayer,
   moveRows,
   setIndicators
 }: {
   isSortable: boolean;
   itemToRegister: Item;
+  showCustomDragLayer: boolean;
   moveRows: (dragIndex: number, hoverIndex: number) => void;
   setIndicators: (state: IndicatorsState) => void;
 }): {
@@ -80,7 +80,7 @@ export const useBaseSortableCell = ({
     }
   });
 
-  const [{ isDragging }, drag] = useDrag<
+  const [{ isDragging }, drag, preview] = useDrag<
     Item,
     { dragIndex: number; dropIndex: number },
     { isDragging: boolean }
@@ -119,6 +119,12 @@ export const useBaseSortableCell = ({
 
   if (isSortable) drag(drop(ref));
 
+  useEffect(() => {
+    if (showCustomDragLayer) {
+      preview(getEmptyImage(), { captureDraggingState: true });
+    }
+  }, [showCustomDragLayer, preview]);
+
   return {
     ref,
     isDragging,
@@ -129,10 +135,12 @@ export const useBaseSortableCell = ({
 export const useSortableCell = ({
   isSortable,
   itemToRegister,
+  showCustomDragLayer,
   moveRows
 }: {
   isSortable: boolean;
   itemToRegister: Item;
+  showCustomDragLayer: boolean;
   moveRows: (dragIndex: number, hoverIndex: number) => void;
 }): ReturnType<typeof useBaseSortableCell> & IndicatorsState => {
   const [indicatorsState, setIndicators] = useState<IndicatorsState>({
@@ -144,33 +152,9 @@ export const useSortableCell = ({
     isSortable,
     itemToRegister,
     moveRows,
-    setIndicators
+    setIndicators,
+    showCustomDragLayer
   });
 
   return { ref, isDragging, isOver, ...indicatorsState };
-};
-
-export const useSortableCellWithContext = ({
-  isSortable,
-  itemToRegister,
-  moveRows
-}: {
-  isSortable: boolean;
-  itemToRegister: Item;
-  moveRows: (dragIndex: number, hoverIndex: number) => void;
-}): ReturnType<typeof useBaseSortableCell> => {
-  const { setDragDropIndicators: setIndicators } = useIndicatorStateContext();
-
-  const { isDragging, ref } = useBaseSortableCell({
-    isSortable,
-    itemToRegister,
-    moveRows,
-    setIndicators
-  });
-
-  return {
-    ref,
-    isDragging,
-    isOver: true
-  };
 };
