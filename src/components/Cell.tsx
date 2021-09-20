@@ -2,10 +2,7 @@
 import React from "react";
 
 // Constants
-import {
-  useSortableCell,
-  useSortableCellWithContext
-} from "../hooks/useSortableCell";
+import { useSortableCell } from "../hooks/useSortableCell";
 
 // Types
 import { IndicatorsState } from "../types";
@@ -18,6 +15,7 @@ interface Props {
   moveRows: (dragIndex: number, hoverIndex: number) => void;
   isDragging?: boolean;
   isOver?: boolean;
+  showCustomDragLayer?: boolean;
 }
 
 export const Cell = React.forwardRef<HTMLDivElement, Props & IndicatorsState>(
@@ -50,6 +48,7 @@ export const SortableCellContainer = (props: Props) => {
   } = useSortableCell({
     isSortable: columnIndex === 0,
     itemToRegister: { id, rowIndex, originalRowIndex: rowIndex },
+    showCustomDragLayer,
     moveRows
   });
 

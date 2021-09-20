@@ -52,7 +52,8 @@ const DragLayer = ({
     (currentOffset?.y ?? 0) - (initialSourceClientOffset?.y ?? 0);
   const yInitPointer = initialClientOffset?.y ?? 0;
   const yInitSource = initialSourceClientOffset?.y ?? 0;
-  const top = (currentOffset?.y ?? 0) + yInitPointer - yInitSource + 1;
+  const top = currentOffset?.y ?? 0;
+  const topOffsetCorrection = yInitPointer - yInitSource + 1;
 
   return (
     <div
@@ -63,19 +64,15 @@ const DragLayer = ({
         width: `${tableWidth}px`,
         display: !displacementY ? "none" : "block",
         top: `${top}px`,
-        left: `${leftOffset}px`
+        left: `${leftOffset}px`,
+        zIndex: 10
       }}
     />
   );
 };
 
-const Table = ({
-  dragStartIndex,
-  hoverIndex
-}: {
-  dragStartIndex?: number;
-  hoverIndex?: number;
-}): React.ReactElement => {
+const Table = (): React.ReactElement => {
+  const [showCustomDragLayer, setShowCustomDragLayer] = useState(false);
   const [rows, setRows] = useState(() => generateData());
 
   const moveRows = useCallback((dragIndex, hoverIndex) => {
@@ -98,13 +95,16 @@ const Table = ({
         columnIndex={columnIndex}
         text={rows[rowIndex][columnIndex]}
         moveRows={moveRows}
+        showCustomDragLayer={showCustomDragLayer}
       />
     </div>
   );
 
   return (
     <>
-      <DragLayer rowHeight={64} leftOffset={0} tableWidth={500} />
+      {showCustomDragLayer ? (
+        <DragLayer rowHeight={64} leftOffset={8} tableWidth={500} />
+      ) : null}
       <Grid
         cellRenderer={cellRenderer}
         columnCount={COLUMNS_COUNT}
