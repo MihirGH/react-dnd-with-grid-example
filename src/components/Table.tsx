@@ -50,10 +50,8 @@ const DragLayer = ({
 
   const displacementY =
     (currentOffset?.y ?? 0) - (initialSourceClientOffset?.y ?? 0);
-  const yInitPointer = initialClientOffset?.y ?? 0;
-  const yInitSource = initialSourceClientOffset?.y ?? 0;
+
   const top = currentOffset?.y ?? 0;
-  const topOffsetCorrection = yInitPointer - yInitSource + 1;
 
   return (
     <div
@@ -106,6 +104,7 @@ const Table = (): React.ReactElement => {
         <DragLayer rowHeight={64} leftOffset={8} tableWidth={500} />
       ) : null}
       <Grid
+        key={showCustomDragLayer ? "show" : "hide"}
         cellRenderer={cellRenderer}
         columnCount={COLUMNS_COUNT}
         columnWidth={140}
@@ -115,6 +114,9 @@ const Table = (): React.ReactElement => {
         width={500}
         rows={rows}
       />
+      <button onClick={() => setShowCustomDragLayer((prev) => !prev)}>
+        {showCustomDragLayer ? "Hide Custom Layer" : "Show Custom Layer"}
+      </button>
     </>
   );
 };

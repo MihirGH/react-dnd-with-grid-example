@@ -135,10 +135,12 @@ export const useBaseSortableCell = ({
 export const useSortableCell = ({
   isSortable,
   itemToRegister,
+  showCustomDragLayer,
   moveRows
 }: {
   isSortable: boolean;
   itemToRegister: Item;
+  showCustomDragLayer: boolean;
   moveRows: (dragIndex: number, hoverIndex: number) => void;
 }): ReturnType<typeof useBaseSortableCell> & IndicatorsState => {
   const [indicatorsState, setIndicators] = useState<IndicatorsState>({
@@ -150,7 +152,8 @@ export const useSortableCell = ({
     isSortable,
     itemToRegister,
     moveRows,
-    setIndicators
+    setIndicators,
+    showCustomDragLayer
   });
 
   return { ref, isDragging, isOver, ...indicatorsState };
