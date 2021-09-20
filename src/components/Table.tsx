@@ -1,19 +1,11 @@
 // Libraries
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback } from "react";
+import { useDragLayer } from "react-dnd";
 import { Grid } from "react-virtualized";
 import update from "immutability-helper";
 
-// Context
-import { IndicatorStateProvider } from "../contexts/IndicatorStateContext";
-
 // Components
-import {
-  SortableCellContainer,
-  SortableCellWithContextContainer
-} from "./Cell";
-
-// Types
-import { IndicatorsState } from "../types";
+import { SortableCellContainer } from "./Cell";
 
 // Styles
 import "../tableStyles.css";
@@ -78,11 +70,9 @@ const DragLayer = ({
 };
 
 const Table = ({
-  Cell = SortableCellContainer,
   dragStartIndex,
   hoverIndex
 }: {
-  Cell?: typeof SortableCellContainer | typeof SortableCellWithContextContainer;
   dragStartIndex?: number;
   hoverIndex?: number;
 }): React.ReactElement => {
@@ -102,14 +92,12 @@ const Table = ({
 
   const cellRenderer = ({ columnIndex, key, rowIndex, style }) => (
     <div key={key} style={style}>
-      <Cell
+      <SortableCellContainer
         id={rows[rowIndex][columnIndex]}
         rowIndex={rowIndex}
         columnIndex={columnIndex}
         text={rows[rowIndex][columnIndex]}
         moveRows={moveRows}
-        dragStartIndex={dragStartIndex}
-        hoverIndex={hoverIndex}
       />
     </div>
   );
@@ -128,27 +116,6 @@ const Table = ({
         rows={rows}
       />
     </>
-  );
-};
-
-export const TableWithContext = () => {
-  const [{ dragStartIndex, hoverIndex }, setDragDropIndicators] = useState<
-    IndicatorsState
-  >({
-    dragStartIndex: -1,
-    hoverIndex: -1
-  });
-
-  const contextValue = useMemo(() => ({ setDragDropIndicators }), []);
-
-  return (
-    <IndicatorStateProvider value={contextValue}>
-      <Table
-        Cell={SortableCellWithContextContainer}
-        dragStartIndex={dragStartIndex}
-        hoverIndex={hoverIndex}
-      />
-    </IndicatorStateProvider>
   );
 };
 
