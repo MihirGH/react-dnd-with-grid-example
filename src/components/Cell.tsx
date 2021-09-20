@@ -15,7 +15,7 @@ interface Props {
   moveRows: (dragIndex: number, hoverIndex: number) => void;
   isDragging?: boolean;
   isOver?: boolean;
-  showCustomDragLayer?: boolean;
+  showCustomDragLayer: boolean;
 }
 
 export const Cell = React.forwardRef<HTMLDivElement, Props & IndicatorsState>(
@@ -37,7 +37,7 @@ export const Cell = React.forwardRef<HTMLDivElement, Props & IndicatorsState>(
 );
 
 export const SortableCellContainer = (props: Props) => {
-  const { id, rowIndex, columnIndex, moveRows } = props;
+  const { id, rowIndex, columnIndex, showCustomDragLayer, moveRows } = props;
 
   const {
     ref,
