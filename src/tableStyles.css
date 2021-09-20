@@ -1,0 +1,28 @@
+* {
+  box-sizing: "border-box";
+}
+
+.table-cell {
+  position: relative;
+  border-bottom: 1px solid black;
+  border-right: 1px solid black;
+  line-height: 30px;
+  text-align: left;
+  padding: 16px;
+
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.first-column {
+  border-left: 1px solid black;
+}
+
+.first-row {
+  border-top: 1px solid black;
+}
+
+.sortable-table-cell {
+  cursor: move;
+  background-color: aliceblue;
+}
